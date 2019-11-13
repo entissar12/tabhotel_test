@@ -1,0 +1,36 @@
+version: '3'
+
+volumes:
+  postgres_data_local: {}
+  postgres_backup_local: {}
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+    environment:
+      - POSTGRES_USER=tabhotel_api
+      - POSTGRES_PASSWORD=tabhotel_api
+      - POSTGRES_HOST=postgres
+      - USE_DOCKER=yes
+      - DATABASE_URL=postgres://tabhotel_api:tabhotel_api@postgres/tabhotel_api
+    ports:
+      - "8000:8000"
+    command:
+      - /start.sh
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    volumes:
+      - postgres_data_local:/var/lib/postgresql/data
+      - postgres_backup_local:/backups
+    environment:
+      - POSTGRES_USER=tabhotel_api
+
